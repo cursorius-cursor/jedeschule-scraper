@@ -44,82 +44,30 @@ def get_hamburg():
     with open('data/hamburg.json', 'w') as json_file:
         json_file.write(json.dumps(data))
 
-
 def get_mv():
     url_mv = 'https://www.regierung-mv.de/serviceassistent/download?id=1614165'
     wget.download(url_mv, 'mv.xlsx')
     workbook = xlrd.open_workbook('mv.xlsx')
+    data = []
+
+    kuerzel = {}
+    kuerzel['IGS'] = "Integrierte Gesamtschule"
+    kuerzel['FöL/FöSp'] = 'Schule mit dem Förderschwerpunkt Lernen und dem Förderschwerpunkt Sprache'
+    kuerzel['KGS/GS/\nFöL'] = 'Kooperative Gesamtschule mit Grundschule und Schule mit dem Förderschwerpunkt Lernen'
+    kuerzel['FöG/FöKr'] = 'Schule mit dem Förderschwerpunkt Lernen und dem Förderschwerpunkt Unterricht kranker Schülerinnen und Schüler'
+
+    # get all values from sheet "Legende"
+    sheet = workbook.sheet_by_name("Legende")
+    for row_num in range(sheet.nrows):
+        row_value = sheet.row_values(row_num)
+        if row_value[0] and row_value[1]:
+            kuerzel[ row_value[0]] =  row_value[1]
+
     sheets = [
         'Schulverzeichnis öffentl. ABS', 
         'Schulverzeichnis öffentl. BLS',
         'Schulverzeichnis freie ABS']
 
-    legend = {
-        'schulart': {
-            'Agy': 'Abendgymnasium',
-            'BLS': 'Berufliche Schule',
-            'FöG': 'Schule mit dem Förderschwerpunkt geistige Entwicklung',
-            'FöH': 'Schule mit dem Förderschwerpunkt Hören',
-            'FöK': 'Schule mit dem Förderschwerpunkt körperliche und motorische Entwicklung',
-            'FöK/FöSp': 'Schule mit dem Förderschwerpunkt körperliche und motorische Entwicklung und dem Förderschwerpunkt Sprache',
-            'FöK/GS': 'Schule mit dem Förderschwerpunkt körperliche und motorische Entwicklung mit Grundschule',
-            'FöKr': 'Schule mit dem Förderschwerpunkt Unterricht kranker Schülerinnen und Schüler',
-            'FöL': 'Schule mit dem Förderschwerpunkt Lernen',
-            'FöL/FöG': 'Schule mit dem Förderschwerpunkt Lernen und  dem Förderschwerpunkt geistige Entwicklung',
-            'FöL/FöKr': 'Schule mit dem Förderschwerpunkt Lernen und dem Förderschwerpunkt Unterricht kranker Schülerinnen und Schüler',
-            'FöL/FöV': 'Schule mit dem Förderschwerpunkt emotionale und soziale Entwicklung und dem Förderschwerpunkt Lernen',
-            'FöL/FöV/FöKr': 'Schule mit den Förderschwerpunkten Lernen, dem Förderschwerpunkt emotionale und soziale Entwicklung sowie dem Förderschwerpunkt Unterricht kranker Schülerinnen und Schüler',
-            'FöL/FöV/FöSp': 'Schule mit den Förderschwerpunkten Lernen, dem Förderschwerpunkt emotionale und soziale Entwicklung sowie dem Förderschwerpunkt Sprache',
-            'FöS': 'Schule mit dem Förderschwerpunkt Sehen',
-            'FöSp': 'Schule mit dem Förderschwerpunkt Sprache',
-            'FöV': 'Schule mit dem Förderschwerpunkt emotionale und soziale Entwicklung',
-            'FöV/FöKr': 'Schule mit dem Förderschwerpunkt emotionale und soziale Entwicklung und dem Förderschwerpunkt Unterricht kranker Schülerinnen und Schüler',
-            'FöV/FöL': 'Schule mit dem Förderschwerpunkt emotionale und soziale Entwicklung und dem Förderschwerpunkt Lernen',
-            'FöL/FöSp': 'Schule mit dem Förderschwerpunkt Lernen und dem Förderschwerpunkt Sprache',
-            'FöG/FöKr': 'Schule mit dem Förderschwerpunkt Lernen und dem Förderschwerpunkt Unterricht kranker Schülerinnen und Schüler',
-            'GS': 'Grundschule',
-            'GS/FöSp': 'Grundschule mit selbstständigen Klassen mit dem Förderschwerpunkt Sprache',
-            'GS/OS': 'Grundschule mit schulartunabhängiger Orientierungsstufe',
-            'GS/OS/Gy': 'Grundschule mit schulartunabhängiger Orientierungsstufe und Gymnasium',
-            'Gy': 'Gymnasium',
-            'Gy/OS': 'Gymnasium mit schulartunabhängiger Orientierungsstufe (z.B. auch Musikgymnasien und Gymnasien für hochbegabte Schülerinnen und Schüler)',
-            'GS/OS': 'Grundschule mit schulartunabhängiger Orientierungsstufe',
-            'Gy/GS/OS': 'Gymnasium mit Grundschule und schulartunabhängiger Orientierungsstufe',
-            'Gy/GS/OS': 'Gymnasium mit Grundschule und schulartunabhängiger Orientierungsstufe',
-            'Gy/RegS': 'Gymnasium mit Regionaler Schule (z.B. auch Sportgymnasien)',
-            'Gy/RegS/GS': 'Gymnasium mit Regionaler Schule und Grundschule',
-            'IGS': 'Integrierte Gesamtschule',
-            'IGS/GS': 'Integrierte Gesamtschule mit Grundschule',
-            'IGS/GS/FöG': 'Integrierte Gesamtschule mit Grundschule  und Schule mit dem Förderschwerpunkt geistige Entwicklung',
-            'KGS': 'Kooperative Gesamtschule',
-            'KGS/GS': 'Kooperative Gesamtschule mit Grundschule',
-            'KGS/GS/FöL': 'Kooperative Gesamtschule mit Grundschule und Schule mit dem Förderschwerpunkt Lernen',
-            'KGS/GS/\nFöL': 'Kooperative Gesamtschule mit Grundschule und Schule mit dem Förderschwerpunkt Lernen',
-            'RegS': 'Regionale Schule',
-            'RegS/GS': 'Regionale Schule mit Grundschule',
-            'RegS/Gy': 'Regionale Schule mit Gymnasium',
-            'WS': 'Waldorfschule'
-        },
-        'schulamt': {
-            'GW': 'Greifswald',
-            'NB': 'Neubrandenburg',
-            'RO': 'Rostock',
-            'SN': 'Schwerin',
-            'BM': 'Ministerium für Bildung, Wissenschaft und Kultur'
-
-        },
-        'landkreis': {
-            'HRO': 'Hansestadt Rostock',
-            'SN': 'Landeshauptstadt Schwerin',
-            'LRO': 'Landkreis Rostock',
-            'LUP': 'Landkreis Ludwigslust-Parchim',
-            'MSE': 'Landkreis Mecklenburgische Seenplatte',
-            'NWM': 'Landkreis Nordwestmecklenburg',
-            'VG': 'Landkreis Vorpommern-Greifswald',
-            'VR': 'Landkreis Vorpommern-Rügen'
-        }
-    }
-    data = []
     for sheet in sheets:
         worksheet = workbook.sheet_by_name(sheet)
         keys = [v.value for v in worksheet.row(0)]
@@ -129,19 +77,46 @@ def get_mv():
             row_data = {}
             for col_number, cell in enumerate(worksheet.row(row_number)):
                 row_data[keys[col_number]] = cell.value
-            if (row_data['Schulname'] != ''):
-                row_data['Schulbehörde'] = legend['schulamt'][row_data['Schul-behörde']]
-                row_data['Landkreis/ kreisfr. Stadt'] = legend['landkreis'][row_data['Landkreis/ kreisfr. Stadt']]
+            if row_data['Schulname']:
                 
-                if sheet != 'Schulverzeichnis öffentl. BLS':
-                    row_data['Schulart/ Org.form'] = '#' + legend['schulart'][row_data['Schulart/ Org.form']]
+                # change key from Schul-behörde to Schulbehörde
+                row_data['Schulbehörde'] = kuerzel[row_data['Schul-behörde']]
+                del row_data['Schul-behörde']
+
+                row_data['Landkreis/ kreisfr. Stadt'] = kuerzel[row_data['Landkreis/ kreisfr. Stadt']]
+
+                if row_data.get('Schulart/ Org.form'):
+                    row_data['Schulart/ Org.form'] = kuerzel[row_data['Schulart/ Org.form']]
                 else:
                     row_data['Schulart/Org.form:'] = 'Berufliche Schule'
+
+                # change key from Plz to PLZ
+                row_data['PLZ'] = int(row_data['Plz'])
+                del row_data['Plz']
+                
+                # add Schulstatus and separate from Schulname
+                if '-Staatlich anerkannte Ersatzschule-' in row_data['Schulname']:
+                       row_data['Schulstatus'] = 'Staatlich anerkannte Ersatzschule'
+                else:
+                    row_data['Schulname'] = row_data['Schulname'].split('-Staatlich')[0].strip()
+
+                if '-Staatlich genehmigte Ersatzschule-' in row_data['Schulname']:
+                       row_data['Schulstatus'] = 'Staatlich genehmigte Ersatzschule'
+                else:
+                    row_data['Schulname'] = row_data['Schulname'].split('-Staatlich')[0].strip()
+                
                 data.append(row_data)
+                
+                #print (40*'#')
+                #for k, v in row_data.items():
+                #    print(f"{k:20} {v}")
 
     with open('data/mecklenburg-vorpommern.json', 'w') as json_file:
-        json_file.write(json.dumps(data))
+        json_file.write(json.dumps(data))  
+ 
 
+
+        
 @defer.inlineCallbacks
 def crawl():
     yield runner.crawl(BremenSpider)
@@ -156,7 +131,7 @@ def crawl():
     yield runner.crawl(BerlinSpider)
     reactor.stop()
 
-crawl()
-reactor.run() # the script will block here until the last crawl call is finished
+#crawl()
+#reactor.run() # the script will block here until the last crawl call is finished
 get_mv()
-get_hamburg()
+#get_hamburg()
