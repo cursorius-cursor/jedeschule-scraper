@@ -27,7 +27,7 @@ configure_logging()
 settings = get_project_settings()
 runner = CrawlerRunner(settings)
 
-url_mv = 'https://www.regierung-mv.de/serviceassistent/download?id=1599568'
+#url_mv = 'https://www.regierung-mv.de/serviceassistent/download?id=1599568'
 
 def get_hamburg():
     url = 'https://geoportal-hamburg.de/geodienste_hamburg_de/HH_WFS_Schulen?REQUEST=GetFeature&SERVICE=WFS&SRSNAME=EPSG%3A25832&TYPENAME=staatliche_schulen&VERSION=1.1.0&outpuFormat=application/json'
@@ -46,39 +46,54 @@ def get_hamburg():
 
 
 def get_mv():
-    url_mv = 'https://www.regierung-mv.de/serviceassistent/download?id=1599568'
-    wget.download(url_mv, 'mv.xls')
-    workbook = xlrd.open_workbook('mv.xls')
-    sheets = ['Schulverzeichnis öffentl. ABS', 'Schulverzeichnis öffentl. BLS','Schulverzeichnis freie ABS']
+    url_mv = 'https://www.regierung-mv.de/serviceassistent/download?id=1614165'
+    wget.download(url_mv, 'mv.xlsx')
+    workbook = xlrd.open_workbook('mv.xlsx')
+    sheets = [
+        'Schulverzeichnis öffentl. ABS', 
+        'Schulverzeichnis öffentl. BLS',
+        'Schulverzeichnis freie ABS']
 
     legend = {
         'schulart': {
             'Agy': 'Abendgymnasium',
+            'BLS': 'Berufliche Schule',
+            'FöG': 'Schule mit dem Förderschwerpunkt geistige Entwicklung',
+            'FöH': 'Schule mit dem Förderschwerpunkt Hören',
+            'FöK': 'Schule mit dem Förderschwerpunkt körperliche und motorische Entwicklung',
+            'FöK/FöSp': 'Schule mit dem Förderschwerpunkt körperliche und motorische Entwicklung und dem Förderschwerpunkt Sprache',
+            'FöK/GS': 'Schule mit dem Förderschwerpunkt körperliche und motorische Entwicklung mit Grundschule',
+            'FöKr': 'Schule mit dem Förderschwerpunkt Unterricht kranker Schülerinnen und Schüler',
             'FöL': 'Schule mit dem Förderschwerpunkt Lernen',
+            'FöL/FöG': 'Schule mit dem Förderschwerpunkt Lernen und  dem Förderschwerpunkt geistige Entwicklung',
+            'FöL/FöKr': 'Schule mit dem Förderschwerpunkt Lernen und dem Förderschwerpunkt Unterricht kranker Schülerinnen und Schüler',
+            'FöL/FöV': 'Schule mit dem Förderschwerpunkt emotionale und soziale Entwicklung und dem Förderschwerpunkt Lernen',
+            'FöL/FöV/FöKr': 'Schule mit den Förderschwerpunkten Lernen, dem Förderschwerpunkt emotionale und soziale Entwicklung sowie dem Förderschwerpunkt Unterricht kranker Schülerinnen und Schüler',
+            'FöL/FöV/FöSp': 'Schule mit den Förderschwerpunkten Lernen, dem Förderschwerpunkt emotionale und soziale Entwicklung sowie dem Förderschwerpunkt Sprache',
             'FöS': 'Schule mit dem Förderschwerpunkt Sehen',
             'FöSp': 'Schule mit dem Förderschwerpunkt Sprache',
-            'FöK': 'Schule mit dem Förderschwerpunkt körperliche und motorische Entwicklung',
-            'FöK/GS': 'Schule mit dem Förderschwerpunkt körperliche und motorische Entwicklung mit Grundschule',
-            'FöG': 'Schule mit dem Förderschwerpunkt geistige Entwicklung',
-            'FöKr': 'Schule mit dem Förderschwerpunkt Unterricht kranker Schülerinnen und Schüler',
-            'FöL/FöG': 'Schule mit dem Förderschwerpunkt Lernen und  dem Förderschwerpunkt geistige Entwicklung',
             'FöV': 'Schule mit dem Förderschwerpunkt emotionale und soziale Entwicklung',
             'FöV/FöKr': 'Schule mit dem Förderschwerpunkt emotionale und soziale Entwicklung und dem Förderschwerpunkt Unterricht kranker Schülerinnen und Schüler',
-            'FöV/FöL': 'Schule mit dem Förderschwerpunkt emotionale und soziale Entwicklung und dem Förderschwerpunkt Lernen)',
-            'FöL/FöV/FöKr': 'Schule mit den Förderschwerpunkten Lernen, dem Förderschwerpunkt emotionale und soziale Entwicklung sowie dem Förderschwerpunkt Unterricht kranker Schülerinnen und Schüler',
-            'FöH': 'Schule mit dem Förderschwerpunkt Hören',
+            'FöV/FöL': 'Schule mit dem Förderschwerpunkt emotionale und soziale Entwicklung und dem Förderschwerpunkt Lernen',
+            'FöL/FöSp': 'Schule mit dem Förderschwerpunkt Lernen und dem Förderschwerpunkt Sprache',
+            'FöG/FöKr': 'Schule mit dem Förderschwerpunkt Lernen und dem Förderschwerpunkt Unterricht kranker Schülerinnen und Schüler',
             'GS': 'Grundschule',
-            'GS/OS': 'Grundschule mit schulartunabhängiger Orientierungsstufe',
             'GS/FöSp': 'Grundschule mit selbstständigen Klassen mit dem Förderschwerpunkt Sprache',
+            'GS/OS': 'Grundschule mit schulartunabhängiger Orientierungsstufe',
             'GS/OS/Gy': 'Grundschule mit schulartunabhängiger Orientierungsstufe und Gymnasium',
             'Gy': 'Gymnasium',
+            'Gy/OS': 'Gymnasium mit schulartunabhängiger Orientierungsstufe (z.B. auch Musikgymnasien und Gymnasien für hochbegabte Schülerinnen und Schüler)',
+            'GS/OS': 'Grundschule mit schulartunabhängiger Orientierungsstufe',
             'Gy/GS/OS': 'Gymnasium mit Grundschule und schulartunabhängiger Orientierungsstufe',
+            'Gy/GS/OS': 'Gymnasium mit Grundschule und schulartunabhängiger Orientierungsstufe',
+            'Gy/RegS': 'Gymnasium mit Regionaler Schule (z.B. auch Sportgymnasien)',
             'Gy/RegS/GS': 'Gymnasium mit Regionaler Schule und Grundschule',
             'IGS': 'Integrierte Gesamtschule',
             'IGS/GS': 'Integrierte Gesamtschule mit Grundschule',
             'IGS/GS/FöG': 'Integrierte Gesamtschule mit Grundschule  und Schule mit dem Förderschwerpunkt geistige Entwicklung',
             'KGS': 'Kooperative Gesamtschule',
             'KGS/GS': 'Kooperative Gesamtschule mit Grundschule',
+            'KGS/GS/FöL': 'Kooperative Gesamtschule mit Grundschule und Schule mit dem Förderschwerpunkt Lernen',
             'KGS/GS/\nFöL': 'Kooperative Gesamtschule mit Grundschule und Schule mit dem Förderschwerpunkt Lernen',
             'RegS': 'Regionale Schule',
             'RegS/GS': 'Regionale Schule mit Grundschule',
@@ -89,7 +104,9 @@ def get_mv():
             'GW': 'Greifswald',
             'NB': 'Neubrandenburg',
             'RO': 'Rostock',
-            'SN': 'Schwerin'
+            'SN': 'Schwerin',
+            'BM': 'Ministerium für Bildung, Wissenschaft und Kultur'
+
         },
         'landkreis': {
             'HRO': 'Hansestadt Rostock',
@@ -113,12 +130,13 @@ def get_mv():
             for col_number, cell in enumerate(worksheet.row(row_number)):
                 row_data[keys[col_number]] = cell.value
             if (row_data['Schulname'] != ''):
-                row_data['Staatl. Schulamt'] = legend['schulamt'][row_data['Staatl. Schulamt']]
+                row_data['Schulbehörde'] = legend['schulamt'][row_data['Schul-behörde']]
                 row_data['Landkreis/ kreisfr. Stadt'] = legend['landkreis'][row_data['Landkreis/ kreisfr. Stadt']]
+                
                 if sheet != 'Schulverzeichnis öffentl. BLS':
-                    row_data['Schulart/ Org.form'] = legend['schulart'][row_data['Schulart/ Org.form']]
+                    row_data['Schulart/ Org.form'] = '#' + legend['schulart'][row_data['Schulart/ Org.form']]
                 else:
-                    row_data['Schulart/ Org.form'] = 'Berufliche Schule'
+                    row_data['Schulart/Org.form:'] = 'Berufliche Schule'
                 data.append(row_data)
 
     with open('data/mecklenburg-vorpommern.json', 'w') as json_file:
